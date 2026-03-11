@@ -1,0 +1,46 @@
+body {
+  margin: 0;
+  background-color: #614444;
+  color: #9a8080;
+  font-family: Arial, sans-serif;
+}
+.app-container {
+  min-height: 100vh;
+  padding: 40px;
+}
+
+.todo-input {
+  padding: 8px;
+  margin-right: 8px;
+  background-color: #dbded0;
+  color: white;
+  border: 1px solid #79a6e6;
+}
+
+.add-btn {
+  padding: 8px 12px;
+  background-color: #8a7b7b;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.todo-list 
+  margin-top: 20px;
+}
+
+.todo-item {
+  margin-bottom: 10px;
+}
+
+.delete-btn {
+  margin-left: 10px;
+  background-color: #5a1e1e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointter;
+}
+
+
+
