@@ -1,21 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
 function App() {
   const [todos, setTodos] = useState([]) //存储已有的所有todos（一个空的数组）
   const [input, setInput] = useState('') //存储用户正在输入的文字（每次按键都会更新）
   
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/todos/')
+      .then(res => res.json())
+      .then(data => setTodos(data))
+  }, [])
+
+
   const handleAdd = () => {
     if (input.trim() === '') {
         alert('Please enter a todo')
         return 
       }
-      setTodos([...todos, input])
-      setInput('')
+      fetch('http://127.0.0.1:8000/api/todos/', {
+        method:'POST',
+        headers:{ 'Content-Type': 'application/json'},
+        body: JSON.stringify({ title:input,completed: false })
+      })
+        .then(res => res.json())
+        .then(newTodo => {
+          setTodos([...todos, newTodo])
+          setInput('')
+        })
   }
 
-  function handleDelete(index) {
-    setTodos(todos.filter(function(_, i) {
-      return i !== index
-    }))
+  const handleDelete = (id) => {
+    fetch(`http://127.0.0.1:8000/api/todos/${id}/`, {
+      method: 'DELETE'
+    })
+      .then(() => setTodos(todos.filter(todo => todo.id !== id)))
     //if delete a list 
     //remove a list and it's index
   }
@@ -28,10 +45,10 @@ function App() {
         onChange={(e)=> setInput(e.target.value)}/> 
         <button onClick={handleAdd}> Add Todo </button> 
       <ul>
-        {todos.map((todo,index) => (
-          <li key={index}>
-            {todo}
-            <button onClick={() => handleDelete(index)}>Delete</button>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            {todo.title}
+            <button onClick={() => handleDelete(todo.id)}>Delete</button>
           </li>
         ))}
       </ul>
