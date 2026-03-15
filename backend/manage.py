@@ -20,3 +20,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+#Django根据这个file生成数据库表结构

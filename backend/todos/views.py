@@ -6,3 +6,4 @@ class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
+#API核心——增删改查
