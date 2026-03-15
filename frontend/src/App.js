@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 
 function App() {
+   // Store all todos fetched from the backend
   const [todos, setTodos] = useState([]) //存储已有的所有todos（一个空的数组）
+  // Store the current text inside the input box
   const [input, setInput] = useState('') //存储用户正在输入的文字（每次按键都会更新）
+  // Store loading state for the first fetch
   
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/todos/')
