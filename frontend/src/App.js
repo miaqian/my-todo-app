@@ -42,7 +42,7 @@ function App() {
   
   return (
     <div>
-      <h1>Todo App</h1>
+      <h1>Aella's Todo List</h1>
       <input 
         value ={input} 
         onChange={(e)=> setInput(e.target.value)}/> 
