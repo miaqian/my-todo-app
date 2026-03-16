@@ -1,0 +1,16 @@
+asgiref==3.8.1
+certifi==2022.12.7
+distlib==0.3.6
+Django==4.2.16
+django-cors-headers==4.9.0
+djangorestframework==3.16.1
+filelock==3.10.0
+gunicorn==23.0.0
+mysqlclient==2.2.7
+packaging==26.0
+pipenv==2023.2.18
+platformdirs==3.1.1
+sqlparse==0.5.1
+typing_extensions==4.12.2
+virtualenv==20.21.0
+virtualenv-clone==0.5.7
