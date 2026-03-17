@@ -8,7 +8,7 @@ function App() {
   // Store loading state for the first fetch
   
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/todos/')
+    fetch('https://web-production-492b.up.railway.app/api/todos/')
       .then(res => res.json())
       .then(data => setTodos(data))
   }, [])
@@ -19,7 +19,7 @@ function App() {
         alert('Please enter a todo')
         return 
       }
-      fetch('http://127.0.0.1:8000/api/todos/', {
+      fetch('https://web-production-492b.up.railway.app/api/todos/', {
         method:'POST',
         headers:{ 'Content-Type': 'application/json'},
         body: JSON.stringify({ title:input,completed: false })
@@ -32,7 +32,7 @@ function App() {
   }
 
   const handleDelete = (id) => {
-    fetch(`http://127.0.0.1:8000/api/todos/${id}/`, {
+    fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
       method: 'DELETE'
     })
       .then(() => setTodos(todos.filter(todo => todo.id !== id)))
