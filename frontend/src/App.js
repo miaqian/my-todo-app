@@ -61,6 +61,11 @@ function App() {
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => handleToggle(todo.id, todo.completed)}
+              />
             {todo.title}
             <button onClick={() => handleDelete(todo.id)}>Delete</button>
           </li>
