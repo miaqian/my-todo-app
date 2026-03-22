@@ -40,6 +40,17 @@ function App() {
     //remove a list and it's index
   }
   
+  const handleToggle = (id, completed) => {
+    fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed: !completed })
+    })
+    .then(res => res.json())
+    .then(updatedTodo => {
+      setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo))
+    })
+  }
   return (
     <div>
       <h1>Aella's Todo List</h1>
