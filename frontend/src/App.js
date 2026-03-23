@@ -1,6 +1,10 @@
+//这个文件从Todo拿数据
+//把todo显示出来
+//让用户可以新增、删除、勾选完成
+//通过这个项目学习到react负责界面和状态，django后端负责村数据
 import { useState, useEffect } from 'react'
 
-function App() {
+function App() { //define a function component the name is App
    // Store all todos fetched from the backend
   const [todos, setTodos] = useState([]) //存储已有的所有todos（一个空的数组）
   // Store the current text inside the input box
@@ -59,8 +63,13 @@ function App() {
         onChange={(e)=> setInput(e.target.value)}/> 
         <button onClick={handleAdd}> Add Todo </button> 
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
+        {[...todos]
+          .sort((a, b) => a.completed - b.completed)
+          .map((todo) =>(
+          <li key={todo.id} style={{
+            textDecoration: todo.completed ? 'line-through' : 'none',
+            color: todo.completed ? 'gray' : 'black'
+          }}>
             <input
               type="checkbox"
               checked={todo.completed}
