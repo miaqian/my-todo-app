@@ -81,6 +81,8 @@ function App() { //define a function component the name is App
       <span className="floaty f5">🦄</span>
       <span className="floaty f6">🌈</span>
       <span className="floaty f7">❤️</span>
+      <span className="floaty f8">🎀</span>
+      <span className="floaty f9">🐶</span>
 
       <div className="card">
 
