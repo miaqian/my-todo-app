@@ -1,46 +1,103 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  background-color: #614444;
-  color: #9a8080;
-  font-family: Arial, sans-serif;
+  padding: 0;
 }
-.app-container {
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gardient(135deg, ede9fe 0%, #F5F3FF 50%, #FCE7F3 100%);
   min-height: 100vh;
-  padding: 40px;
+}
+
+.world {
+  min-height: 100vh;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.floaty {
+  position: fixed;
+  font-size: 22px;
+  animation: float 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.f1 { top: 5%; left: 4%; animation-delay: 0s; }
+.f2 { top: 10%; right: 6%; animation-delay: 1s; font-size:16px; }
+.f3 { top: 50%; right: 3%; animation-delay: 2s; font-size:18px; }
+.f4 { bottom: 10%; right: 8%; animation-delay: 0.5s; font-size:14px; }
+.f5 { bottom: 12%; right: 5%; animation-delay: 1.5s; }
+.f6 { top:35%; right: 4%; animation-delay: 3s; font-size:14px; }
+
+
+@keyframes float {
+  0%， 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(6deg); }
+}
+
+.card {
+  background:rgba(255, 255, 255, 0.88);
+  border-radius: 28px;
+  padding: 1.5rem;
+  border: 2.5px solid #DDD6FE;
+  position: relative;
+  z-index: 1;
+  max-width:480px;
+  margin: 0 auto;
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.crown {
+  front-size:36px;
+  display:block;
+  margin-bottom:6px;
+  animation:float 4s ease-in-out infinite;
+}
+
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #5b21b6
+  letter-spacing: -0.3px;
+}
+
+.time-display {
+  font-size: 1rem;
+  color: #a78bfa;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom:1.2rem;
 }
 
 .todo-input {
-  padding: 8px;
-  margin-right: 8px;
-  background-color: #dbded0;
-  color: white;
-  border: 1px solid #79a6e6;
+  flex:1;
+  padding: 11px 16px;
+  border: 2px solid #DDD6FE;
+  border-radius: 50px;
+  font-size: 14px;
+  outline: none;
+  font-family: 'Nunito', sans-serif;
+  color: #5b21b6;
+  background:#f5f3ff;
 }
 
 .add-btn {
-  padding: 8px 12px;
-  background-color: #8a7b7b;
-  color: white;
-  border: none;
-  cursor: pointer;
+  background:linear-gardient(135deg, #7c3aed, #a855f7);
+  color:white;
+  border:none;
+  border-radius:50px;
+  
 }
-
-.todo-list 
-  margin-top: 20px;
-}
-
-.todo-item {
-  margin-bottom: 10px;
-}
-
-.delete-btn {
-  margin-left: 10px;
-  background-color: #5a1e1e;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointter;
-}
-
-
-
