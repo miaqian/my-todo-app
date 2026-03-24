@@ -8,7 +8,7 @@
 
 body {
   font-family: 'Nunito', sans-serif;
-  background: linear-gardient(135deg, ede9fe 0%, #F5F3FF 50%, #FCE7F3 100%);
+  background: #EDE9FE;
   min-height: 100vh;
 }
 
@@ -29,10 +29,10 @@ body {
 .f1 { top: 5%; left: 4%; animation-delay: 0s; }
 .f2 { top: 10%; right: 6%; animation-delay: 1s; font-size:16px; }
 .f3 { top: 50%; right: 3%; animation-delay: 2s; font-size:18px; }
-.f4 { bottom: 10%; right: 8%; animation-delay: 0.5s; font-size:14px; }
+.f4 { bottom: 10%; right: 38%; animation-delay: 0.5s; font-size:14px; }
 .f5 { bottom: 12%; right: 5%; animation-delay: 1.5s; }
 .f6 { top:35%; right: 4%; animation-delay: 3s; font-size:14px; }
-
+.f7 { bottom: 35%; left: 14%; animation-delay: 3s; }
 
 @keyframes float {
   0%， 100% { transform: translateY(0px) rotate(0deg); }

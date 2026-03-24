@@ -76,10 +76,11 @@ function App() { //define a function component the name is App
       {/* 浮动 emoji */}
       <span className="floaty f1">🌸</span>
       <span className="floaty f2">⭐</span>
-      <span className="floaty f3">🦋</span>
+      <span className="floaty f3">🍄</span>
       <span className="floaty f4">🌙</span>
-      <span className="floaty f5">🍀</span>
+      <span className="floaty f5">🦄</span>
       <span className="floaty f6">🌈</span>
+      <span className="floaty f7">❤️</span>
 
       <div className="card">
 
