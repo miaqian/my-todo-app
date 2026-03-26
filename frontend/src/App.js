@@ -12,6 +12,8 @@ function App() { //define a function component the name is App
   const [input, setInput] = useState('') //存储用户正在输入的文字（每次按键都会更新）
   // Store loading state for the first fetch
   const [time, setTime] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editText, setEditText] = useState('')
   
   useEffect(() => {
     fetch('https://web-production-492b.up.railway.app/api/todos/')
@@ -56,7 +58,7 @@ function App() { //define a function component the name is App
     //remove a list and it's index
   }
   
-  const handleToggle = (id, completed) => {
+  const handleToggle = (id, completed) => { //和后端通信+更新前端状态
     fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -67,9 +69,26 @@ function App() { //define a function component the name is App
       setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo))
     })
   }
+
+const handleEdit = (id, newTitle) => {
+  fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: newTitle })
+  })
+    .then(res => res.json())
+    .then(updatedTodo => {
+      setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo))
+      setEditingId(null)
+    })
+}
+
+
+
   const sortedTodos = [...todos].sort((a,b) => a.completed - b.completed)
-  
-  return (
+  //复制一份todos；按完成状态排序；未完成的排前面，完成的放后面
+
+  return ( //渲染页面
 
     <div className="world">
 
@@ -114,7 +133,26 @@ function App() { //define a function component the name is App
                 checked={todo.completed}
                 onChange={() => handleToggle(todo.id, todo.completed)}
               />
-              <span className="todo-text">{todo.title}</span>
+              {editingId === todo.id ? (
+                  <input
+                    className="todo-input"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    onBlur={() => handleEdit(todo.id, editText)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleEdit(todo.id, editText)}
+                    autoFocus
+                  />
+                ) : (
+                  <span
+                    className="todo-text"
+                    onDoubleClick={() => {
+                      setEditingId(todo.id)
+                      setEditText(todo.title)
+                    }}
+                  >
+                    {todo.title}
+                  </span>
+                )}
               <button className="delete-btn" onClick={() => handleDelete(todo.id)}>Delete</button>
             </li>
           ))}
