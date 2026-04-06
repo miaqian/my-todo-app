@@ -95,7 +95,7 @@ const formatDate = (year, month, day) => {
   return `${year}-${m}-${d}`
 }
 //今天的日期
-const today = new Date().toISOString().split('T')[0]
+const today = new Date().toLocaleDateString('en-CA') // 本地时间
 //计算这个月的所有日期格子（包含开头的空格）
 const calendarDays = () => {
   const firstDay = new Date(currentYear, currentMonth, 1).getDay() //这个月第一天是星期几
