@@ -40,19 +40,43 @@ function App() { //define a function component the name is App
 
   const handleAdd = () => {
     if (input.trim() === '') {
-        alert('Please enter a todo')
-        return 
-      }
-      fetch('https://web-production-492b.up.railway.app/api/todos/', {
-        method:'POST',
-        headers:{ 'Content-Type': 'application/json'},
-        body: JSON.stringify({ title:input,completed: false, date: selectedDate })
+      alert('Please enter a todo')
+      return
+    }
+
+    console.log('Add clicked')
+    console.log('input:', input)
+    console.log('selectedDate:', selectedDate)
+
+    fetch('https://web-production-492b.up.railway.app/api/todos/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: input,
+        completed: false,
+        date: selectedDate
       })
-        .then(res => res.json())
-        .then(newTodo => {
-          setTodos([...todos, newTodo])
-          setInput('')
-        })
+    })
+      .then(async (res) => {
+        console.log('status:', res.status)
+
+        const data = await res.json()
+        console.log('response data:', data)
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Failed to add todo')
+        }
+
+        return data
+      })
+      .then((newTodo) => {
+        setTodos([...todos, newTodo])
+        setInput('')
+      })
+      .catch((err) => {
+        console.error('Add failed:', err)
+        alert('Add failed. Check console.')
+      })
   }
 
   const handleDelete = (id) => {

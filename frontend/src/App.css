@@ -78,7 +78,7 @@ body {
   margin-top: 4px;
 }
 
-.input-row {
+input-row {
   display: flex;
   gap: 8px;
   margin-bottom:1.2rem;
