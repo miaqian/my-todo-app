@@ -37,7 +37,7 @@ body {
 .f9 { bottom: 45%; left: 35%; animation-delay: 3.5s; font-size:35px;}
 
 @keyframes float {
-  0%， 100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(6deg); }
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 .crown {
-  front-size:36px;
+  font-size:36px;
   display:block;
   margin-bottom:6px;
   animation:float 4s ease-in-out infinite;
@@ -78,7 +78,7 @@ body {
   margin-top: 4px;
 }
 
-input-row {
+.input-row {
   display: flex;
   gap: 8px;
   margin-bottom:1.2rem;
@@ -182,4 +182,74 @@ input-row {
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 0.6; }
   50% { transform: scale(1.5); opacity: 1; }
+}
+
+/* 日历容器 */
+.calendar {
+  margin-bottom: 1.2rem;
+}
+
+/* 日历头部：左箭头 月份 右箭头 */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5B21B6;
+}
+
+.cal-nav {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #7C3AED;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+/* 7列网格 */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day-name {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #A78BFA;
+  padding: 4px 0;
+}
+
+.cal-day {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5B21B6;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.cal-day:hover {
+  background: #EDE9FE;
+}
+
+.cal-day.today {
+  background: #DDD6FE;
+}
+
+.cal-day.selected {
+  background: #7C3AED;
+  color: white;
+}
+
+.cal-day.empty {
+  pointer-events: none;
 }

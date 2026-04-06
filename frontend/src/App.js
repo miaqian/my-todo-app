@@ -14,6 +14,12 @@ function App() { //define a function component the name is App
   const [time, setTime] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0] // 默认选中今天，格式：2026-03-25
+  )
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())//当前显示的月份
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())//当前显示的年份
+
   
   useEffect(() => {
     fetch('https://web-production-492b.up.railway.app/api/todos/')
@@ -40,7 +46,7 @@ function App() { //define a function component the name is App
       fetch('https://web-production-492b.up.railway.app/api/todos/', {
         method:'POST',
         headers:{ 'Content-Type': 'application/json'},
-        body: JSON.stringify({ title:input,completed: false })
+        body: JSON.stringify({ title:input,completed: false, date: selectedDate })
       })
         .then(res => res.json())
         .then(newTodo => {
@@ -83,10 +89,40 @@ const handleEdit = (id, newTitle) => {
     })
 }
 
+const formatDate = (year, month, day) => {
+  const m = String(month + 1). padStart(2, '0') //月份从0开始所以+1，不足两位补0
+  const d = String(day).padStart(2,'0')          //不足两位补0
+  return `${year}-${m}-${d}`
+}
+//今天的日期
+const today = new Date().toISOString().split('T')[0]
+//计算这个月的所有日期格子（包含开头的空格）
+const calendarDays = () => {
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay() //这个月第一天是星期几
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate() // 这个月有几天
+  const days = Array(firstDay).fill(null) // 开头补空格
+  for (let i = 1; i <= daysInMonth; i++) days.push(i)
+  return days
+}
+
+// 切换月份
+const changeMonth = (direction) => {
+  let m = currentMonth + direction
+  let y = currentYear
+  if (m > 11) { m = 0; y++ }  // 12月下一个是1月，年份+1
+  if (m < 0)  { m = 11; y-- } // 1月上一个是12月，年份-1
+  setCurrentMonth(m)
+  setCurrentYear(y)
+}
 
 
-  const sortedTodos = [...todos].sort((a,b) => a.completed - b.completed)
-  //复制一份todos；按完成状态排序；未完成的排前面，完成的放后面
+  // const sortedTodos = [...todos].sort((a,b) => a.completed - b.completed)
+  // //复制一份todos；按完成状态排序；未完成的排前面，完成的放后面
+  // 只显示选中日期定的todos，完成的沉底
+  const filteredTodos = todos
+    .filter(todo => todo.date === selectedDate) //只留当天的
+    .sort((a, b) => a.completed - b.completed) //完成的排到后面
+
 
   return ( //渲染页面
 
@@ -112,6 +148,36 @@ const handleEdit = (id, newTitle) => {
           <div className="time-display">{time}</div>
         </div>
 
+        {/* 日历区域 */}
+        {/* 日历区域 */}
+        <div className="calendar">
+          <div className="cal-header">
+            <button className="cal-nav" onClick={() => changeMonth(-1)}>‹</button>
+            <span className="cal-title">
+              {new Date(currentYear, currentMonth).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+            </span>
+            <button className="cal-nav" onClick={() => changeMonth(1)}>›</button>
+          </div>
+          <div className="cal-grid">
+            {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
+              <div key={d} className="cal-day-name">{d}</div>
+            ))}
+            {calendarDays().map((day, i) => (
+              <div
+                key={i}
+                className={`cal-day
+                  ${day ? '' : 'empty'}
+                  ${day && selectedDate === formatDate(currentYear, currentMonth, day) ? 'selected' : ''}
+                  ${day && formatDate(currentYear, currentMonth, day) === today ? 'today' : ''}
+                `}
+                onClick={() => day && setSelectedDate(formatDate(currentYear, currentMonth, day))}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* 输入区域 */}
         <div className="input-row">
           <input
@@ -126,7 +192,7 @@ const handleEdit = (id, newTitle) => {
 
         {/* 待办列表 */}
         <ul className="todo-list">
-          {sortedTodos.map((todo) => (
+          {filteredTodos.map((todo) => (
             <li key={todo.id} className={`todo-item ${todo.completed ? 'done' : ''}`}>
               <input
                 type="checkbox"
