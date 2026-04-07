@@ -3,6 +3,7 @@
 //让用户可以新增、删除、勾选完成
 //通过这个项目学习到react负责界面和状态，django后端负责村数据
 import { useState, useEffect } from 'react'
+import HabitTracker from './HabitTracker'
 import './App.css'
 
 function App() { //define a function component the name is App
@@ -248,6 +249,8 @@ const changeMonth = (direction) => {
           ))}
         </ul>
 
+        {/* Habit Tracker */}
+        <HabitTracker selectedDate={selectedDate} />
         {/* 底部装饰点 */}
         <div className="footer-dots">
           <span className="dot"></span>

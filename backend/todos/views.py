@@ -11,9 +11,14 @@ class HabitViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer  # 习惯的增删改查
 
 class HabitLogViewSet(viewsets.ModelViewSet):
-    queryset = HabitLog.objects.all()
-    serializer_class = HabitLogSerializer  # 打卡记录的增删改查
+    serializer_class = HabitLogSerializer
 
+    def get_queryset(self):
+        queryset = HabitLog.objects.all()
+        date = self.request.query_params.get('date')  # 获取URL里的date参数
+        if date:
+            queryset = queryset.filter(date=date)     # 按日期过滤
+        return queryset
 
 
 #API核心——增删改查
