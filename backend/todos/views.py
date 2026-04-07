@@ -11,6 +11,7 @@ class HabitViewSet(viewsets.ModelViewSet):
     serializer_class = HabitSerializer  # 习惯的增删改查
 
 class HabitLogViewSet(viewsets.ModelViewSet):
+    queryset = HabitLog.objects.all()
     serializer_class = HabitLogSerializer
 
     def get_queryset(self):
