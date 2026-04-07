@@ -6,7 +6,7 @@ class TodoSerializer(serializers.ModelSerializer):
         model = Todo
         fields = ['id', 'title', 'completed', 'created_at', 'date']
 
-class HabitSerializer(serializers.ModelSerialize):
+class HabitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = ['id', 'name','created_at'] #x习惯的字段
