@@ -16,9 +16,15 @@ class HabitLogViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = HabitLog.objects.all()
-        date = self.request.query_params.get('date')  # 获取URL里的date参数
+        date = self.request.query_params.get('date')
+        date_from = self.request.query_params.get('date_from')
+        date_to = self.request.query_params.get('date_to')
         if date:
-            queryset = queryset.filter(date=date)     # 按日期过滤
+            queryset = queryset.filter(date=date)
+        if date_from:
+            queryset = queryset.filter(date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(date__lte=date_to)
         return queryset
 
 

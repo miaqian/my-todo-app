@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react'
 import API from './api'
 
-function HabitTracker({ selectedDate }) {
-  const [habits, setHabits] = useState([])        // 所有习惯
-  const [logs, setLogs] = useState([])            // 今天的打卡记录
-  const [input, setInput] = useState('')          // 新习惯输入框
+// Returns a date string YYYY-MM-DD offset by `days` from the given date string
+const addDays = (dateStr, days) => {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const date = new Date(y, m - 1, d + days)
+  return date.toLocaleDateString('en-CA')
+}
 
-  // 页面加载时获取所有习惯和今天的打卡记录
+function HabitTracker({ selectedDate }) {
+  const [habits, setHabits] = useState([])
+  const [logs, setLogs] = useState([])       // today's logs
+  const [history, setHistory] = useState([]) // last 60 days logs for streak + dots
+  const [input, setInput] = useState('')
+
   useEffect(() => {
     fetch(`${API}/habits/`)
       .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to load habits')
-        }
+        if (!res.ok) throw new Error('Failed to load habits')
         return res.json()
       })
       .then(data => setHabits(data))
@@ -23,9 +28,7 @@ function HabitTracker({ selectedDate }) {
 
     fetch(`${API}/habitlogs/?date=${selectedDate}`)
       .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to load habit logs')
-        }
+        if (!res.ok) throw new Error('Failed to load habit logs')
         return res.json()
       })
       .then(data => setLogs(data))
@@ -33,9 +36,36 @@ function HabitTracker({ selectedDate }) {
         console.error('Failed to load habit logs:', err)
         setLogs([])
       })
+
+    const dateFrom = addDays(selectedDate, -59)
+    fetch(`${API}/habitlogs/?date_from=${dateFrom}&date_to=${selectedDate}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load habit history')
+        return res.json()
+      })
+      .then(data => setHistory(data))
+      .catch((err) => {
+        console.error('Failed to load habit history:', err)
+        setHistory([])
+      })
   }, [selectedDate])
 
-  // 添加新习惯
+  const getLast7Days = () => {
+    return Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 6))
+  }
+
+  const getStreak = (habitId) => {
+    let streak = 0
+    let cursor = selectedDate
+    while (true) {
+      const hasLog = history.some(log => log.habit === habitId && log.date === cursor)
+      if (!hasLog) break
+      streak++
+      cursor = addDays(cursor, -1)
+    }
+    return streak
+  }
+
   const handleAddHabit = () => {
     if (input.trim() === '') return
     fetch(`${API}/habits/`, {
@@ -44,74 +74,59 @@ function HabitTracker({ selectedDate }) {
       body: JSON.stringify({ name: input })
     })
       .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to add habit')
-        }
+        if (!res.ok) throw new Error('Failed to add habit')
         return res.json()
       })
       .then(newHabit => {
         setHabits([...habits, newHabit])
         setInput('')
       })
-      .catch((err) => {
-        console.error('Add habit failed:', err)
-      })
+      .catch((err) => console.error('Add habit failed:', err))
   }
 
-  // 打卡 / 取消打卡
   const handleToggleLog = (habitId) => {
     const existing = logs.find(log => log.habit === habitId)
     if (existing) {
-      // 已打卡 → 取消
       fetch(`${API}/habitlogs/${existing.id}/`, { method: 'DELETE' })
         .then((res) => {
-          if (!res.ok) {
-            throw new Error('Failed to delete habit log')
-          }
+          if (!res.ok) throw new Error('Failed to delete habit log')
           setLogs(logs.filter(log => log.id !== existing.id))
+          setHistory(history.filter(log => log.id !== existing.id))
         })
-        .catch((err) => {
-          console.error('Delete habit log failed:', err)
-        })
+        .catch((err) => console.error('Delete habit log failed:', err))
     } else {
-      // 未打卡 → 打卡
       fetch(`${API}/habitlogs/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ habit: habitId, date: selectedDate })
       })
         .then(res => {
-          if (!res.ok) {
-            throw new Error('Failed to create habit log')
-          }
+          if (!res.ok) throw new Error('Failed to create habit log')
           return res.json()
         })
-        .then(newLog => setLogs([...logs, newLog]))
-        .catch((err) => {
-          console.error('Create habit log failed:', err)
+        .then(newLog => {
+          setLogs([...logs, newLog])
+          setHistory([...history, newLog])
         })
+        .catch((err) => console.error('Create habit log failed:', err))
     }
   }
 
-  // 删除习惯
   const handleDeleteHabit = (id) => {
     fetch(`${API}/habits/${id}/`, { method: 'DELETE' })
       .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to delete habit')
-        }
+        if (!res.ok) throw new Error('Failed to delete habit')
         setHabits(habits.filter(h => h.id !== id))
       })
-      .catch((err) => {
-        console.error('Delete habit failed:', err)
-      })
+      .catch((err) => console.error('Delete habit failed:', err))
   }
+
+  const last7Days = getLast7Days()
 
   return (
     <div className="habit-section">
       <div className="habit-title">🌱 Habit Tracker</div>
 
-      {/* 添加习惯 */}
       <div className="input-row">
         <input
           className="todo-input"
@@ -123,18 +138,37 @@ function HabitTracker({ selectedDate }) {
         <button className="add-btn" onClick={handleAddHabit}>+ Add</button>
       </div>
 
-      {/* 习惯列表 */}
       <ul className="todo-list">
         {habits.map(habit => {
-          const done = logs.some(log => log.habit === habit.id) // 今天有没有打卡
+          const done = logs.some(log => log.habit === habit.id)
+          const streak = getStreak(habit.id)
           return (
-            <li key={habit.id} className={`todo-item ${done ? 'done' : ''}`}>
+            <li key={habit.id} className={`todo-item habit-item ${done ? 'done' : ''}`}>
               <input
                 type="checkbox"
                 checked={done}
                 onChange={() => handleToggleLog(habit.id)}
               />
-              <span className="todo-text">{habit.name}</span>
+              <div className="habit-info">
+                <span className="todo-text">{habit.name}</span>
+                <div className="habit-history">
+                  <div className="habit-dots">
+                    {last7Days.map(day => {
+                      const checked = history.some(log => log.habit === habit.id && log.date === day)
+                      return (
+                        <span
+                          key={day}
+                          className={`habit-dot ${checked ? 'checked' : ''}`}
+                          title={day}
+                        />
+                      )
+                    })}
+                  </div>
+                  {streak > 0 && (
+                    <span className="habit-streak">🔥 {streak} day{streak > 1 ? 's' : ''}</span>
+                  )}
+                </div>
+              </div>
               <button className="delete-btn" onClick={() => handleDeleteHabit(habit.id)}>Delete</button>
             </li>
           )

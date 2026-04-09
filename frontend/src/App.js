@@ -17,12 +17,16 @@ function App() { //define a function component the name is App
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0] // 默认选中今天，格式：2026-03-25
+    new Date().toLocaleDateString('en-CA') // 默认选中今天，格式：2026-03-25
   )
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())//当前显示的月份
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())//当前显示的年份
 
   
+  useEffect(() => {
+    setEditingId(null)
+  }, [selectedDate])
+
   useEffect(() => {
     fetch(`${API_BASE}/todos/`)
       .then(res => {
