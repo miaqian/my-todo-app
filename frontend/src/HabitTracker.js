@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API = 'https://web-production-492b.up.railway.app/api'
+import API from './api'
 
 function HabitTracker({ selectedDate }) {
   const [habits, setHabits] = useState([])        // 所有习惯
@@ -10,12 +9,30 @@ function HabitTracker({ selectedDate }) {
   // 页面加载时获取所有习惯和今天的打卡记录
   useEffect(() => {
     fetch(`${API}/habits/`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load habits')
+        }
+        return res.json()
+      })
       .then(data => setHabits(data))
+      .catch((err) => {
+        console.error('Failed to load habits:', err)
+        setHabits([])
+      })
 
     fetch(`${API}/habitlogs/?date=${selectedDate}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load habit logs')
+        }
+        return res.json()
+      })
       .then(data => setLogs(data))
+      .catch((err) => {
+        console.error('Failed to load habit logs:', err)
+        setLogs([])
+      })
   }, [selectedDate])
 
   // 添加新习惯
@@ -26,10 +43,18 @@ function HabitTracker({ selectedDate }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: input })
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to add habit')
+        }
+        return res.json()
+      })
       .then(newHabit => {
         setHabits([...habits, newHabit])
         setInput('')
+      })
+      .catch((err) => {
+        console.error('Add habit failed:', err)
       })
   }
 
@@ -39,7 +64,15 @@ function HabitTracker({ selectedDate }) {
     if (existing) {
       // 已打卡 → 取消
       fetch(`${API}/habitlogs/${existing.id}/`, { method: 'DELETE' })
-        .then(() => setLogs(logs.filter(log => log.id !== existing.id)))
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Failed to delete habit log')
+          }
+          setLogs(logs.filter(log => log.id !== existing.id))
+        })
+        .catch((err) => {
+          console.error('Delete habit log failed:', err)
+        })
     } else {
       // 未打卡 → 打卡
       fetch(`${API}/habitlogs/`, {
@@ -47,15 +80,31 @@ function HabitTracker({ selectedDate }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ habit: habitId, date: selectedDate })
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to create habit log')
+          }
+          return res.json()
+        })
         .then(newLog => setLogs([...logs, newLog]))
+        .catch((err) => {
+          console.error('Create habit log failed:', err)
+        })
     }
   }
 
   // 删除习惯
   const handleDeleteHabit = (id) => {
     fetch(`${API}/habits/${id}/`, { method: 'DELETE' })
-      .then(() => setHabits(habits.filter(h => h.id !== id)))
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to delete habit')
+        }
+        setHabits(habits.filter(h => h.id !== id))
+      })
+      .catch((err) => {
+        console.error('Delete habit failed:', err)
+      })
   }
 
   return (

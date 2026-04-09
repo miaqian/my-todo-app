@@ -23,8 +23,6 @@ class HabitLog(models.Model):
 
     def __str__(self):
         return f"{self.habit.name} - {self.date}"
-    def __str__(self):
-        return self.title 
     
     #这个文件是Django用来定义数据结构的地方，在Django里，model就是在告诉程序-要存什么数据
     #-每条数据有哪些字段-每条字段是什么类型-这些数据最后会怎么存进数据库

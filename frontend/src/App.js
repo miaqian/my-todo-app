@@ -4,6 +4,7 @@
 //通过这个项目学习到react负责界面和状态，django后端负责村数据
 import { useState, useEffect } from 'react'
 import HabitTracker from './HabitTracker'
+import API_BASE from './api'
 import './App.css'
 
 function App() { //define a function component the name is App
@@ -23,9 +24,18 @@ function App() { //define a function component the name is App
 
   
   useEffect(() => {
-    fetch('https://web-production-492b.up.railway.app/api/todos/')
-      .then(res => res.json())
+    fetch(`${API_BASE}/todos/`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load todos')
+        }
+        return res.json()
+      })
       .then(data => setTodos(data))
+      .catch((err) => {
+        console.error('Failed to load todos:', err)
+        setTodos([])
+      })
   }, [])
 
   useEffect(() => {
@@ -49,7 +59,7 @@ function App() { //define a function component the name is App
     console.log('input:', input)
     console.log('selectedDate:', selectedDate)
 
-    fetch('https://web-production-492b.up.railway.app/api/todos/', {
+    fetch(`${API_BASE}/todos/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -81,41 +91,65 @@ function App() { //define a function component the name is App
   }
 
   const handleDelete = (id) => {
-    fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
+    fetch(`${API_BASE}/todos/${id}/`, {
       method: 'DELETE'
     })
-      .then(() => setTodos(todos.filter(todo => todo.id !== id)))
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to delete todo')
+        }
+        setTodos(todos.filter(todo => todo.id !== id))
+      })
+      .catch((err) => {
+        console.error('Delete failed:', err)
+      })
     //if delete a list 
     //remove a list and it's index
   }
   
   const handleToggle = (id, completed) => { //和后端通信+更新前端状态
-    fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
+    fetch(`${API_BASE}/todos/${id}/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed: !completed })
     })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Failed to update todo')
+      }
+      return res.json()
+    })
     .then(updatedTodo => {
       setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo))
+    })
+    .catch((err) => {
+      console.error('Toggle failed:', err)
     })
   }
 
 const handleEdit = (id, newTitle) => {
-  fetch(`https://web-production-492b.up.railway.app/api/todos/${id}/`, {
+  fetch(`${API_BASE}/todos/${id}/`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title: newTitle })
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Failed to edit todo')
+      }
+      return res.json()
+    })
     .then(updatedTodo => {
       setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo))
       setEditingId(null)
     })
+    .catch((err) => {
+      console.error('Edit failed:', err)
+    })
 }
 
 const formatDate = (year, month, day) => {
-  const m = String(month + 1). padStart(2, '0') //月份从0开始所以+1，不足两位补0
+  const m = String(month + 1).padStart(2, '0') //月份从0开始所以+1，不足两位补0
   const d = String(day).padStart(2,'0')          //不足两位补0
   return `${year}-${m}-${d}`
 }
