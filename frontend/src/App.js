@@ -7,26 +7,26 @@ import HabitTracker from './HabitTracker'
 import API_BASE from './api'
 import './App.css'
 
-function App() { //define a function component the name is App
-   // Store all todos fetched from the backend
-  const [todos, setTodos] = useState([]) //存储已有的所有todos（一个空的数组）
-  // Store the current text inside the input box
-  const [input, setInput] = useState('') //存储用户正在输入的文字（每次按键都会更新）
-  // Store loading state for the first fetch
+function App() {
+  // React state only lives in the browser while the page is open.
+  // The permanent source of truth is still the Django database.
+  const [todos, setTodos] = useState([])
+  const [input, setInput] = useState('')
   const [time, setTime] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toLocaleDateString('en-CA') // 默认选中今天，格式：2026-03-25
+    new Date().toLocaleDateString('en-CA')
   )
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())//当前显示的月份
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())//当前显示的年份
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
-  
+  // If the user switches to another date, stop editing the old todo row.
   useEffect(() => {
     setEditingId(null)
   }, [selectedDate])
 
+  // Load todos once when the page first opens.
   useEffect(() => {
     fetch(`${API_BASE}/todos/`)
       .then(res => {
@@ -42,6 +42,7 @@ function App() { //define a function component the name is App
       })
   }, [])
 
+  // The clock is pure frontend state and does not involve the backend.
   useEffect(() => {
     const tick = () => {
       const now = new Date()
@@ -63,6 +64,8 @@ function App() { //define a function component the name is App
     console.log('input:', input)
     console.log('selectedDate:', selectedDate)
 
+    // Send the new todo to Django, then merge the response into local state
+    // so the UI updates immediately without a full refetch.
     fetch(`${API_BASE}/todos/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -107,11 +110,10 @@ function App() { //define a function component the name is App
       .catch((err) => {
         console.error('Delete failed:', err)
       })
-    //if delete a list 
-    //remove a list and it's index
   }
   
-  const handleToggle = (id, completed) => { //和后端通信+更新前端状态
+  // PATCH only updates one field on an existing todo instead of replacing the whole object.
+  const handleToggle = (id, completed) => {
     fetch(`${API_BASE}/todos/${id}/`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -153,41 +155,39 @@ const handleEdit = (id, newTitle) => {
 }
 
 const formatDate = (year, month, day) => {
-  const m = String(month + 1).padStart(2, '0') //月份从0开始所以+1，不足两位补0
-  const d = String(day).padStart(2,'0')          //不足两位补0
+  const m = String(month + 1).padStart(2, '0')
+  const d = String(day).padStart(2,'0')
   return `${year}-${m}-${d}`
 }
-//今天的日期
-const today = new Date().toLocaleDateString('en-CA') // 本地时间
-//计算这个月的所有日期格子（包含开头的空格）
+const today = new Date().toLocaleDateString('en-CA')
+
+// Build the calendar grid for the visible month.
+// Empty cells at the beginning align day 1 with the correct weekday.
 const calendarDays = () => {
-  const firstDay = new Date(currentYear, currentMonth, 1).getDay() //这个月第一天是星期几
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate() // 这个月有几天
-  const days = Array(firstDay).fill(null) // 开头补空格
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay()
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+  const days = Array(firstDay).fill(null)
   for (let i = 1; i <= daysInMonth; i++) days.push(i)
   return days
 }
 
-// 切换月份
 const changeMonth = (direction) => {
   let m = currentMonth + direction
   let y = currentYear
-  if (m > 11) { m = 0; y++ }  // 12月下一个是1月，年份+1
-  if (m < 0)  { m = 11; y-- } // 1月上一个是12月，年份-1
+  if (m > 11) { m = 0; y++ }
+  if (m < 0)  { m = 11; y-- }
   setCurrentMonth(m)
   setCurrentYear(y)
 }
 
 
-  // const sortedTodos = [...todos].sort((a,b) => a.completed - b.completed)
-  // //复制一份todos；按完成状态排序；未完成的排前面，完成的放后面
-  // 只显示选中日期定的todos，完成的沉底
+  // The backend returns all todos; the calendar decides which day to show.
   const filteredTodos = todos
-    .filter(todo => todo.date === selectedDate) //只留当天的
-    .sort((a, b) => a.completed - b.completed) //完成的排到后面
+    .filter(todo => todo.date === selectedDate)
+    .sort((a, b) => a.completed - b.completed)
 
 
-  return ( //渲染页面
+  return (
 
     <div className="world">
 

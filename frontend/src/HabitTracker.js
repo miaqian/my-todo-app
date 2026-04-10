@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import API from './api'
 
-// Returns a date string YYYY-MM-DD offset by `days` from the given date string
+// Keep date math in one helper so the request code below stays readable.
 const addDays = (dateStr, days) => {
   const [y, m, d] = dateStr.split('-').map(Number)
   const date = new Date(y, m - 1, d + days)
@@ -14,6 +14,11 @@ function HabitTracker({ selectedDate }) {
   const [history, setHistory] = useState([]) // last 60 days logs for streak + dots
   const [input, setInput] = useState('')
 
+  // This effect reloads whenever the selected calendar day changes.
+  // We fetch three related datasets:
+  // 1. all habits
+  // 2. logs for the selected day
+  // 3. recent history used to render streaks and dot indicators
   useEffect(() => {
     fetch(`${API}/habits/`)
       .then(res => {
@@ -54,6 +59,8 @@ function HabitTracker({ selectedDate }) {
     return Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 6))
   }
 
+  // A streak means "how many consecutive days, ending on selectedDate,
+  // does this habit have a log for?"
   const getStreak = (habitId) => {
     let streak = 0
     let cursor = selectedDate
@@ -87,6 +94,8 @@ function HabitTracker({ selectedDate }) {
   const handleToggleLog = (habitId) => {
     const existing = logs.find(log => log.habit === habitId)
     if (existing) {
+      // If today's log exists, toggling removes it from both today's data
+      // and the longer history list that drives the streak UI.
       fetch(`${API}/habitlogs/${existing.id}/`, { method: 'DELETE' })
         .then((res) => {
           if (!res.ok) throw new Error('Failed to delete habit log')
@@ -105,6 +114,8 @@ function HabitTracker({ selectedDate }) {
           return res.json()
         })
         .then(newLog => {
+          // Keep local state in sync with the server response so the checkbox,
+          // dots, and streak update immediately.
           setLogs([...logs, newLog])
           setHistory([...history, newLog])
         })
