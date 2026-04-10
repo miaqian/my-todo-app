@@ -1,12 +1,43 @@
 from rest_framework import viewsets
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from .models import Todo, Habit, HabitLog
 from .serializers import TodoSerializer, HabitSerializer, HabitLogSerializer
+
+
+def extract_text_from_upload(uploaded_file):
+    if not uploaded_file:
+        return ''
+
+    uploaded_file.seek(0)
+    raw_bytes = uploaded_file.read()
+    uploaded_file.seek(0)
+
+    for encoding in ('utf-8-sig', 'utf-16', 'latin-1'):
+        try:
+            return raw_bytes.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+
+    return raw_bytes.decode('utf-8', errors='replace')
 
 class TodoViewSet(viewsets.ModelViewSet):
     # ModelViewSet gives us the standard REST actions automatically:
     # list, create, retrieve, update, partial_update, and destroy.
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def perform_create(self, serializer):
+        uploaded_file = self.request.FILES.get('file') or self.request.FILES.get('uploaded_file')
+        file_content = extract_text_from_upload(uploaded_file)
+        serializer.save(file_content=file_content)
+
+    def perform_update(self, serializer):
+        uploaded_file = self.request.FILES.get('file') or self.request.FILES.get('uploaded_file')
+        file_content = serializer.instance.file_content
+        if uploaded_file:
+            file_content = extract_text_from_upload(uploaded_file)
+        serializer.save(file_content=file_content)
 
 class HabitViewSet(viewsets.ModelViewSet):
     queryset = Habit.objects.all()

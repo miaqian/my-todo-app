@@ -6,6 +6,8 @@ class Todo(models.Model):
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     date = models.DateField(null=True, blank=True)
+    uploaded_file = models.FileField(upload_to='uploads/', null=True, blank=True)
+    file_content = models.TextField(blank=True, default='')
 
 class Habit(models.Model):
     name = models.CharField(max_length=200)        # 习惯名称，比如"喝水"
